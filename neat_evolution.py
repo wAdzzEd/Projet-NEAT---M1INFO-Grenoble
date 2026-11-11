@@ -369,7 +369,37 @@ def speciate_population(
         parmi les membres de chaque espèce.
         Chaque génome se voit attribuer un species_id via son attribut genome.species_id.
     """
-    #todo: Implémenter la fonction de spéciation en suivant l'algorithme décrit ci-dessus.
+    species_dict: Dict[int, List[Genome]] = {}
+
+    for representative in species_representatives:
+        species_dict[representative.species_id] = []
+
+    for genome in population:
+        assigned_species_id = None
+
+        for representative in species_representatives:
+            distance = genome_distance(genome, representative, c1, c2, c3)
+            if(distance < compatibility_threshold):
+                assigned_species_id = representative.species_id
+                break
+
+        if assigned_species_id is None:
+            assigned_species_id = next_species_id
+            next_species_id += 1
+            species_dict[assigned_species_id] = []
+
+        genome.species_id = assigned_species_id
+        species_dict[assigned_species_id].append(genome)
+
+    species_list = []
+    for genomes in species_dict.values():
+        if genomes:
+            species_list.append(genomes)
+
+    new_representatives = []
+    for genomes in species_list:
+        new_representatives.append(genomes[np.random.randint(len(genomes))])
+
     return species_list, new_representatives, next_species_id
 
 
